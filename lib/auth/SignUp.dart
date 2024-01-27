@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'SignIn.dart';
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
 
@@ -46,13 +48,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _signUp() async {
     try {
-      // Create a new user with Firebase Authentication
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
-      // Add additional details to Firestore
       if (userCredential.user != null) {
         await _firestore.collection('adminUsers').add({
           'c_name': _selectedContractor,
@@ -60,22 +60,23 @@ class _SignUpPageState extends State<SignUpPage> {
           'isApproved': false,
         });
 
-        // Handle successful sign up (e.g., navigate to another page)
-        // Example: Navigate to the home screen
-        // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
+        // Navigate to SignInPage after successful sign up
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const SignInPage()),
+        );
       }
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'An error occurred')),
       );
     } catch (e) {
-      // Handle other errors
       print(e); // For debugging
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred. Please try again later.')),
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
