@@ -7,10 +7,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
+        // Title removed for a cleaner look
       ),
-      drawer: MediaQuery.of(context).size.width <= 600 ? AppDrawer() : null, // Drawer for small screens
-      body: MediaQuery.of(context).size.width > 600 ? _LargeScreenLayout() : Center(child: Text('Welcome to the Home Page')), // Different layout for large screens
+      drawer: MediaQuery.of(context).size.width <= 600 ? AppDrawer() : null,
+      body: MediaQuery.of(context).size.width > 600 ? _LargeScreenLayout() : Center(child: Text('Welcome to the Home Page')),
     );
   }
 }
@@ -19,12 +19,11 @@ class _LargeScreenLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 10, // Number of tabs
+      length: 10,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Top Tabs Navigation'),
           bottom: TabBar(
-            isScrollable: true,
+            isScrollable: false,
             tabs: [
               Tab(icon: Icon(Icons.view_list), text: 'View Complains'),
               Tab(icon: Icon(Icons.people), text: 'View Drivers'),
@@ -36,7 +35,6 @@ class _LargeScreenLayout extends StatelessWidget {
               Tab(icon: Icon(Icons.build), text: 'Toolbox Talk'),
               Tab(icon: Icon(Icons.description), text: 'Contracts'),
               Tab(icon: Icon(Icons.settings), text: 'Settings'),
-              // Add more tabs here if needed
             ],
           ),
         ),
@@ -52,7 +50,6 @@ class _LargeScreenLayout extends StatelessWidget {
             Center(child: Text('Toolbox Talk')),
             Center(child: Text('Contracts')),
             Center(child: Text('Settings')),
-            // Add more tab views here if needed
           ],
         ),
       ),
@@ -113,7 +110,6 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.settings),
             title: Text('Settings'),
           ),
-          // Add more ListTiles here if needed
         ],
       ),
     );
