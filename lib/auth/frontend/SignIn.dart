@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import '../home/home.dart';
+import '../../home/home.dart';
+import 'SignUp.dart';
+import '../backend/SignInServer.dart'; // Import SignUpPage
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -11,9 +11,9 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  final _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final SignInServer _signInServer = SignInServer();
 
   @override
   void dispose() {
@@ -24,17 +24,17 @@ class _SignInPageState extends State<SignInPage> {
 
   Future<void> _signIn() async {
     try {
-      await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+      await _signInServer.signInWithEmailAndPassword(
+        _emailController.text,
+        _passwordController.text,
       );
       // Navigate to HomePage after successful sign in
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomePage()),
       );
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'An error occurred')),
+        SnackBar(content: Text(e.toString())),
       );
     }
   }
@@ -58,9 +58,23 @@ class _SignInPageState extends State<SignInPage> {
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            ElevatedButton(
-              onPressed: _signIn,
-              child: Text('Sign In'),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ElevatedButton(
+                onPressed: _signIn,
+                child: Text('Sign In'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SignUpPage()), // Navigate to SignUpPage
+                  );
+                },
+                child: Text('Sign Up'),
+              ),
             ),
           ],
         ),
