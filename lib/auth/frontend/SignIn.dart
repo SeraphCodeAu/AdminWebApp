@@ -1,7 +1,9 @@
+// SignIn.dart
+
 import 'package:flutter/material.dart';
 import '../../home/home.dart';
 import 'SignUp.dart';
-import '../backend/SignInServer.dart'; // Import SignUpPage
+import '../backend/SignInServer.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -22,19 +24,21 @@ class _SignInPageState extends State<SignInPage> {
     super.dispose();
   }
 
-  Future<void> _signIn() async {
-    try {
-      await _signInServer.signInWithEmailAndPassword(
-        _emailController.text,
-        _passwordController.text,
-      );
+  Future<void> _signIn(BuildContext context) async {
+    bool signInSuccess = await _signInServer.signInWithEmailAndPassword(
+      _emailController.text,
+      _passwordController.text,
+    );
+
+    if (signInSuccess) {
       // Navigate to HomePage after successful sign in
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomePage()),
       );
-    } catch (e) {
+    } else {
+      // Show error message or not approved message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(content: Text('Sign in failed or account not approved')),
       );
     }
   }
@@ -61,7 +65,7 @@ class _SignInPageState extends State<SignInPage> {
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: ElevatedButton(
-                onPressed: _signIn,
+                onPressed: () => _signIn(context),
                 child: Text('Sign In'),
               ),
             ),
@@ -70,7 +74,7 @@ class _SignInPageState extends State<SignInPage> {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SignUpPage()), // Navigate to SignUpPage
+                    MaterialPageRoute(builder: (_) => const SignUpPage()),
                   );
                 },
                 child: Text('Sign Up'),
