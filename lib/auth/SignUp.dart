@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -12,6 +13,29 @@ class _SignUpPageState extends State<SignUpPage> {
   final _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String? _selectedContractor;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<DropdownMenuItem<String>> _dropdownMenuItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadContractors();
+  }
+
+  Future<void> _loadContractors() async {
+    final querySnapshot = await _firestore.collection('contractors').get();
+    final items = querySnapshot.docs.map((doc) {
+      return DropdownMenuItem<String>(
+        value: doc['c_name'],
+        child: Text(doc['c_name']),
+      );
+    }).toList();
+
+    setState(() {
+      _dropdownMenuItems = items;
+    });
+  }
 
   @override
   void dispose() {
@@ -22,15 +46,33 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _signUp() async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      // Create a new user with Firebase Authentication
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      // Navigate to another page or show success message
+
+      // Add additional details to Firestore
+      if (userCredential.user != null) {
+        await _firestore.collection('adminUsers').add({
+          'c_name': _selectedContractor,
+          'email': _emailController.text,
+          'isApproved': false,
+        });
+
+        // Handle successful sign up (e.g., navigate to another page)
+        // Example: Navigate to the home screen
+        // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
+      }
     } on FirebaseAuthException catch (e) {
-      // Handle error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'An error occurred')),
+      );
+    } catch (e) {
+      // Handle other errors
+      print(e); // For debugging
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred. Please try again later.')),
       );
     }
   }
@@ -53,6 +95,16 @@ class _SignUpPageState extends State<SignUpPage> {
               controller: _passwordController,
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
+            ),
+            DropdownButton<String>(
+              value: _selectedContractor,
+              hint: Text('Select Contractor'),
+              items: _dropdownMenuItems,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedContractor = newValue;
+                });
+              },
             ),
             ElevatedButton(
               onPressed: _signUp,
