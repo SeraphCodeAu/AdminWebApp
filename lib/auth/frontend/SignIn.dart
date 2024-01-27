@@ -25,23 +25,48 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Future<void> _signIn(BuildContext context) async {
-    bool signInSuccess = await _signInServer.signInWithEmailAndPassword(
-      _emailController.text,
-      _passwordController.text,
+    // Show a custom dialog to mimic browser's save password functionality
+    bool? saveCredentials = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Save Login Details'),
+        content: Text('Do you want to save your login details for future sign-ins?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Yes'),
+          ),
+        ],
+      ),
     );
 
-    if (signInSuccess) {
-      // Navigate to HomePage after successful sign in
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomePage()),
+    // Check if user chose to save credentials
+    if (saveCredentials ?? false) {
+      // Save credentials logic (this is symbolic, actual saving in browser is not done here)
+
+      bool signInSuccess = await _signInServer.signInWithEmailAndPassword(
+        _emailController.text,
+        _passwordController.text,
       );
-    } else {
-      // Show error message or not approved message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign in failed or account not approved')),
-      );
+
+      if (signInSuccess) {
+        // Navigate to HomePage after successful sign in
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomePage()),
+        );
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign in failed')),
+        );
+      }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
