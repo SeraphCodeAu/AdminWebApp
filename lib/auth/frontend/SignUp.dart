@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'SignIn.dart';
+import '../backend/SignUpServer.dart'; // Import SignUpServer
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -12,12 +12,12 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   String? _selectedContractor;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<DropdownMenuItem<String>> _dropdownMenuItems = [];
+  final SignUpServer _signUpServer = SignUpServer();
 
   @override
   void initState() {
@@ -48,35 +48,22 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _signUp() async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+      await _signUpServer.createUserWithEmailAndPassword(
+        _emailController.text,
+        _passwordController.text,
+        _selectedContractor,
       );
 
-      if (userCredential.user != null) {
-        await _firestore.collection('adminUsers').add({
-          'c_name': _selectedContractor,
-          'email': _emailController.text,
-          'isApproved': false,
-        });
-
-        // Navigate to SignInPage after successful sign up
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const SignInPage()),
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'An error occurred')),
+      // Navigate to SignInPage after successful sign up
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const SignInPage()),
       );
     } catch (e) {
-      print(e); // For debugging
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred. Please try again later.')),
+        SnackBar(content: Text(e.toString())),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
