@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../home/home.dart';
+import 'SignUp.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -58,9 +59,23 @@ class _SignInPageState extends State<SignInPage> {
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            ElevatedButton(
-              onPressed: _signIn,
-              child: Text('Sign In'),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ElevatedButton(
+                onPressed: _signIn,
+                child: Text('Sign In'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SignUpPage()), // Navigate to SignUpPage
+                  );
+                },
+                child: Text('Sign Up'),
+              ),
             ),
           ],
         ),
