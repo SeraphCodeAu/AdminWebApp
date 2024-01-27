@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'auth/SignUp.dart';  // Import SignUpPage
+import 'auth/SignIn.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const SignUpPage(),  // Set SignUpPage as the home
+      home: const SignInPage(),  // Set SignUpPage as the home
     );
   }
 }
